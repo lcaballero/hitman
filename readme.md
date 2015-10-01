@@ -88,12 +88,6 @@ func main() {
 }
 ```
 
-## Overview
-
-## Installation
-
-## Usage
-
 ## License
 
 See license file.
@@ -106,5 +100,6 @@ notice, or any other, from this software.
 
 
 [EPL-1]: http://opensource.org/licenses/eclipse-1.0.txt
+[DEATH]: https://github.com/vrecan/death
 [PR]: https://github.com/vrecan/death/pull/8
 [FORK]: https://github.com/lcaballero/death/tree/use-closer
