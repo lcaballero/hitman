@@ -59,7 +59,7 @@ If you use the [Death][Death] library then it might it can be written like
 the example below.
 
 __note__: [Death][Death] is waiting to update it's interface based on this [PR][PR]
-and for the duration you can use this [FORK][FORK]
+and for the duration you can use this [FORK][FORK].
 
 ```Go
 
@@ -84,8 +84,6 @@ func main() {
 
 }
 
-func main() {
-}
 ```
 
 ## License
