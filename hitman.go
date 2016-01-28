@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-// A KillContract is sent on the KillChannel when a "go routine" should be
+// A KillSignal is sent on the KillChannel when a "go routine" should be
 // terminated.  It's provided the name in order to verify the contract.
 type KillSignal struct {
 	Name string
@@ -48,11 +48,12 @@ type Target interface {
 // Implements io.Closer.
 type Targets map[string]Contract
 
+// Creates a new Targets mapping.
 func NewTargets() Targets {
 	return make(Targets, 0)
 }
 
-// Saves the given target which can later be terminated.
+// Add saves the given target which can later be terminated.
 func (targets Targets) Add(m Target) {
 	targets[m.Name()] = Contract{
 		Name: m.Name(),
@@ -70,4 +71,13 @@ func (targets Targets) Close() error {
 	}
 	wg.Wait()
 	return nil
+}
+
+// AddOrPanic adds the given target to the collectino of targets so long as
+// the provided error is nil, else it panics.
+func (targets Targets) AddOrPanic(t Target, err error) {
+	if err != nil {
+		panic(err)
+	}
+	targets.Add(t)
 }
