@@ -5,28 +5,23 @@ mainly of `Targets` and workers.  Workers are required to implement a minimal in
 for use with `Targets.Add()`.  When the code needs to shutdown gracefully it can then
 call `Targets.Close()` which will send shutdown signals to the workers.
 
+## Changes
+
+### 2016-03-01
+
+1. Added `AddOrPanic` for services that return errors on construction (convenience).
+1. Partitioned the `Target` interface into `Named` and `Target` so that `Name()` was optional.
+1. Added Put that can take a given name instead of requiring the `Named` interface.
+1. Added tests for the above changes.
+
 ## Example
 
 ```Go
 
-// Workers implement the Target interface requiring Name() and Start() KillChannel
-var id = 0
-func newId() int {
-	id++
-	return id
-}
+// Workers implement the Target interface and Start() KillChannel
 
-type Worker struct {
-	id int
-}
-func NewWorker() *Worker {
-	return &Worker{
-		id: newId(),
-	}
-}
-func (w *Worker) Name() string {
-	return fmt.Sprintf("Work IT!!, %d", w.id)
-}
+type Worker struct {}
+
 func (w *Worker) Start() KillChannel {
 	kill := NewKillChannel()
 	go func(done KillChannel) {
@@ -39,15 +34,11 @@ func (w *Worker) Start() KillChannel {
 	return kill
 }
 
-
 // Worker lifecycles are then managed with a Targets collection:
 func main() {
 	hits := NewTargets()
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
-
+	hits.Add(&Worker{})
+	hits.Add(&Worker{})
 	hits.Close()
 }
 
@@ -68,12 +59,18 @@ import (
     SYS "syscall"
 )
 
+type Service struct {}
+func NewService() (*Server, error) {
+  s := &Service{}
+  // Do something that might produce error
+  _, err := ioutil.ReadFile("doh.txt")
+  return s, err
+}
+
 func main() {
 	hits := NewTargets()
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
-	hits.Add(NewWorker())
+	hits.AddOrPanic(NewWorker())
+	hits.AddOrPanic(NewWorker())
 
 	//pass the signals you want to end your application
 	death := DEATH.NewDeath(SYS.SIGINT, SYS.SIGTERM)
