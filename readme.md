@@ -46,11 +46,9 @@ func main() {
 
 ## Using Death
 
-If you use the [Death][Death] library then it might it can be written like
+If you use the [Death][Death] library then it can be written like
 the example below.
 
-__note__: [Death][Death] is waiting to update it's interface based on this [PR][PR]
-and for the duration you can use this [FORK][FORK].
 
 ```Go
 
@@ -96,5 +94,3 @@ notice, or any other, from this software.
 
 [EPL-1]: http://opensource.org/licenses/eclipse-1.0.txt
 [DEATH]: https://github.com/vrecan/death
-[PR]: https://github.com/vrecan/death/pull/8
-[FORK]: https://github.com/lcaballero/death/tree/use-closer
