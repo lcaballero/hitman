@@ -3,6 +3,7 @@ package hitman
 import (
 	"sync"
 	"log"
+	"code.google.com/p/go-uuid/uuid"
 )
 
 // A KillSignal is sent on the KillChannel when a "go routine" should be
@@ -38,11 +39,22 @@ func (t Contract) Kill(wg *sync.WaitGroup) {
 	}
 }
 
+// Named interface provides a way to name a target optionally.
+type Named interface {
+	Name() string
+}
+
 // A Target is an interface used to acquire the KillChannel for a given
 // target.  The name should be unique.
 type Target interface {
-	Name() string
 	Start() KillChannel
+}
+
+// NamedTarget combines the Named and Target interfaces for those targets
+// that care to implement both.
+type NamedTarget interface {
+	Named
+	Target
 }
 
 // Implements io.Closer.
@@ -54,9 +66,39 @@ func NewTargets() Targets {
 }
 
 // Add saves the given target which can later be terminated.
-func (targets Targets) Add(m Target) {
-	targets[m.Name()] = Contract{
-		Name: m.Name(),
+func (targets Targets) Add(m NamedTarget) {
+	targets.Put(m.Name(), m)
+}
+
+// AddTarget checks to see if the given Target is Named and if so uses
+// that name, else it generates a new UUID as the Target's name.
+func (targets Targets) AddTarget(m Target) {
+	named, ok := m.(Named)
+	if ok {
+		targets.Put(named.Name(), m)
+	} else {
+		targets.Put(uuid.New(), m)
+	}
+}
+
+// AddOrPanic adds the given target to the collection of targets so long as
+// the provided error is nil, else it panics.  This is useful when
+// constructing a new service that might produce an error on construction.
+func (targets Targets) AddOrPanic(t Target, err error) {
+	if err != nil {
+		panic(err)
+	}
+	targets.AddTarget(t)
+}
+
+// AddPair adds target without Target having to implement Named
+func (targets Targets) Put(name string, m Target) {
+	_, alreadyHasTarget := targets[name]
+	if alreadyHasTarget {
+		log.Printf("Given name of target already used: %s\n", name)
+	}
+	targets[name] = Contract{
+		Name: name,
 		Done: m.Start(),
 	}
 }
@@ -65,19 +107,13 @@ func (targets Targets) Add(m Target) {
 func (targets Targets) Close() error {
 	wg := sync.WaitGroup{}
 	wg.Add(len(targets))
-	for name, target := range targets {
-		log.Println("Killing: ", name)
-		target.Kill(&wg)
+	for n, c := range targets {
+		go func(name string, contract Contract) {
+			log.Println("Killing: ", name)
+			contract.Kill(&wg)
+			log.Println("Killed: ", name)
+		}(n, c)
 	}
 	wg.Wait()
 	return nil
-}
-
-// AddOrPanic adds the given target to the collectino of targets so long as
-// the provided error is nil, else it panics.
-func (targets Targets) AddOrPanic(t Target, err error) {
-	if err != nil {
-		panic(err)
-	}
-	targets.Add(t)
 }

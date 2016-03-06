@@ -52,6 +52,66 @@ func TestName(t *testing.T) {
 		t := NewTargets()
 		So(len(t), ShouldEqual, 0)
 	})
+
+	Convey("New Target via literals", t, func() {
+		t := NewTargets()
+		t.AddTarget(&Unnamed{})
+		So(len(t), ShouldEqual, 1)
+		t.Close()
+	})
+
+	Convey("New Target or panic should be fine if no error", t, func() {
+		t := NewTargets()
+		t.AddOrPanic(NewService())
+		So(len(t), ShouldEqual, 1)
+		t.Close()
+	})
+
+	Convey("Should panic when adding a service that failed to instantiate without error", t, func() {
+		defer func() {
+			panicky := recover()
+			err, ok := panicky.(error)
+			So(ok, ShouldBeTrue)
+			So(err, ShouldNotBeNil)
+		}()
+		NewTargets().AddOrPanic(NewServiceWithError())
+	})
+}
+
+
+type Service struct {}
+func NewServiceWithError() (*Service, error) {
+	s := &Service{}
+	return s, fmt.Errorf("Had error while creating new service")
+}
+func NewService() (*Service, error) {
+	s := &Service{}
+	return s, nil
+}
+func (w *Service) Start() KillChannel {
+	kill := NewKillChannel()
+	go func(done KillChannel) {
+		select {
+		case cleaner := <-done:
+			cleaner.WaitGroup.Done()
+			return
+		}
+	}(kill)
+	return kill
+}
+
+
+type Unnamed struct {}
+func (w *Unnamed) Start() KillChannel {
+	kill := NewKillChannel()
+	go func(done KillChannel) {
+		select {
+		case cleaner := <-done:
+			cleaner.WaitGroup.Done()
+			return
+		}
+	}(kill)
+	return kill
 }
 
 
