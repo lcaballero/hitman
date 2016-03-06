@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/lcaballero/hitman.svg?branch=master)](https://travis-ci.org/lcaballero/hitman)
+
 # Introduction
 
 `hitman` is a small library useful for cleaning up `go routines`.  The api consists
