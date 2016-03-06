@@ -4,8 +4,6 @@ go:
    - 1.6
 
 install:
-- go get golang.org/x/tools/cmd/cover
 - export PATH=$PATH:$HOME/gopath/bin
-- go install github.com/lcaballer/hitman/./...
 
-script: go test ./... -cover --race
+script: go test github.com/lcaballero/hitman -cover --race
