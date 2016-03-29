@@ -3,7 +3,7 @@ package hitman
 import (
 	"sync"
 	"log"
-	"code.google.com/p/go-uuid/uuid"
+"github.com/pborman/uuid"
 )
 
 // A KillSignal is sent on the KillChannel when a "go routine" should be
