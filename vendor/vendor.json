@@ -3,16 +3,16 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "code.google.com/p/go-uuid/uuid",
-			"revision": "35bc42037350",
-			"revisionTime": "2014-12-02T10:54:02-06:00",
-			"tree": true
-		},
-		{
 			"path": "github.com/jtolds/gls",
 			"revision": "f1ac7f4f24f50328e6bc838ca4437d1612a0243c",
 			"revisionTime": "2014-11-03T11:57:36-07:00",
 			"tree": true
+		},
+		{
+			"checksumSHA1": "xN14ZoFcgefABp24aowYtQVMDsc=",
+			"path": "github.com/pborman/uuid",
+			"revision": "c55201b036063326c5b1b89ccfe45a184973d073",
+			"revisionTime": "2016-02-16T08:37:10-08:00"
 		},
 		{
 			"path": "github.com/smartystreets/assertions",
@@ -55,5 +55,6 @@
 			"revision": "08f168e593b5aab61849054b77981de812666697",
 			"revisionTime": "2016-02-26T23:10:08-08:00"
 		}
-	]
+	],
+	"rootPath": "github.com/lcaballero/hitman"
 }
