@@ -106,9 +106,10 @@ func (targets Targets) Put(name string, m Target) {
 // Calls Kill for each target added to the collection.
 func (targets Targets) Close() error {
 	wg := sync.WaitGroup{}
-	wg.Add(len(targets))
+	wg.Add(len(targets) * 2)
 	for n, c := range targets {
 		go func(name string, contract Contract) {
+			defer wg.Done()
 			log.Println("Killing: ", name)
 			contract.Kill(&wg)
 			log.Println("Killed: ", name)
